@@ -1,11 +1,16 @@
 import uuid
 from enum import Enum
+from typing import Annotated
 
-from fastapi import FastAPI, Path, Query, Body
-from pydantic import BaseModel, EmailStr
+from fastapi import FastAPI, Path, Query, Body, Header
+
+import schemas
+import constants
+
 
 app = FastAPI()
 
+users = []
 
 class UserFirstName(str, Enum):
     adik = 'adik'
@@ -13,16 +18,9 @@ class UserFirstName(str, Enum):
     kayrat = 'kayrat'
 
 
-class User(BaseModel):
-    id: uuid.UUID = uuid.uuid4()
-    first_name: str = 'Madi'
-    last_name: str
-    email: EmailStr
-
-
 @app.get('/calc/{num1}+{num2}')
 def hello_world(
-    num1: int = Path(...),
+    num1: Annotated[int, Path(...)],
     num2: int = Path(...),
     num3: int = Query(None, alias='num_____3', deprecated=True, ge=5, include_in_schema=False)
 ):
@@ -31,9 +29,24 @@ def hello_world(
     return {'result': num1+num2+num3}
 
 
-@app.post('/users/{name}', response_model=User, tags=['users'], deprecated=True)
-async def bye(name: UserFirstName, user: User = Body(..., embed=True)):
-    user.first_name = name
-    print(user.dict())
-    print(user.json())
+@app.post('/users/', tags=['users'], deprecated=False)
+async def create_user(
+    # locale: Annotated[constants.LocaleType, Header(..., alias='Accept-Language')],
+    user: schemas.CreateUser = Body(..., alias='user')
+) -> schemas.User:
+    users.append(user)
     return user
+
+
+@app.post('/users/{user_id}', tags=['users'], deprecated=False)
+async def update_user(
+    user_id: uuid.UUID,
+    new_user: schemas.CreateUser = Body(..., alias='user')
+) -> schemas.User:
+    user_index = next((i for i, u in enumerate(users) if u.id == user_id), None)
+    print(user_index)
+
+    print('data: ', new_user.dict(exclude_unset=True, exclude_none=True))
+
+
+    return new_user
