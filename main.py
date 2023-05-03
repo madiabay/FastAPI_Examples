@@ -2,7 +2,7 @@ import uuid
 from enum import Enum
 from typing import Annotated
 
-from fastapi import FastAPI, Path, Query, Body, Header, status, Form
+from fastapi import FastAPI, Path, Query, Body, Header, status, Form, UploadFile, File
 from pydantic import HttpUrl
 
 import schemas
@@ -107,3 +107,8 @@ async def login(username: str = Form(...), password: str = Form(...)):
         'username': username,
         'password': password
     }
+
+
+@app.post('/file')
+async def file(file: UploadFile = File(...)):
+    return {'file_name': file.filename}
