@@ -1,7 +1,9 @@
 from enum import Enum
 from typing import Annotated
 
-from fastapi import FastAPI, Path, Query, status, Form, UploadFile, File, HTTPException
+from fastapi import FastAPI, Path, Query, status, Form, UploadFile, File, HTTPException, Depends
+
+import dependencies
 
 from blog_routers import blog_router
 from user_routers import user_router
@@ -24,11 +26,17 @@ class UserFirstName(str, Enum):
 def hello_world(
     num1: Annotated[int, Path(...)],
     num2: int = Path(...),
-    num3: int = Query(None, alias='num_____3', deprecated=True, ge=5, include_in_schema=False)
+    num3: int = Query(None, alias='num_____3', ge=5, include_in_schema=False),
+    common_query: dependencies.CommonQuery = Depends()
 ):
     if not num3:
         num3 = 5
-    return {'result': num1+num2+num3}
+    return {
+        'result': num1+num2+num3,
+        'page_size': common_query.page_size,
+        'page': common_query.page,
+        'limit': common_query.specific_query.limit,
+    }
 
 
 @app.post('/login')
