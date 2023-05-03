@@ -2,7 +2,8 @@ import uuid
 from enum import Enum
 from typing import Annotated
 
-from fastapi import FastAPI, Path, Query, Body, Header
+from fastapi import FastAPI, Path, Query, Body, Header, status, Form
+from pydantic import HttpUrl
 
 import schemas
 import constants
@@ -29,7 +30,7 @@ def hello_world(
     return {'result': num1+num2+num3}
 
 
-@app.post('/users/', tags=['users'], deprecated=False)
+@app.post('/users/', tags=['users'], deprecated=False, status_code=status.HTTP_201_CREATED)
 async def create_user(
     # locale: Annotated[constants.LocaleType, Header(..., alias='Accept-Language')],
     user: schemas.CreateUser = Body(
@@ -93,3 +94,16 @@ async def update_user(
 
 
     return new_user
+
+
+@app.post('/blogs')
+async def create_blog(url: HttpUrl, user: schemas.CreateUser = Body(...)): # добавили в Body одно поле
+    return {'url': url}
+
+
+@app.post('/login')
+async def login(username: str = Form(...), password: str = Form(...)):
+    return {
+        'username': username,
+        'password': password
+    }
