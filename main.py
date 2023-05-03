@@ -32,7 +32,50 @@ def hello_world(
 @app.post('/users/', tags=['users'], deprecated=False)
 async def create_user(
     # locale: Annotated[constants.LocaleType, Header(..., alias='Accept-Language')],
-    user: schemas.CreateUser = Body(..., alias='user')
+    user: schemas.CreateUser = Body(
+        ...,
+        alias='user',
+        examples={
+            "normal": {
+                "summary": "A normal example",
+                "description": "A **normal** item works correctly.",
+                "value": {
+                    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "first_name": "string",
+                    "last_name": "string",
+                    "email": "user@example.com",
+                    "gender": "MALE",
+                    "wallets": [
+                      {
+                        "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                        "currency": "KZT",
+                        "amount": 12
+                      }
+                    ],
+                    "password": "string"
+                },
+            },
+            "invalid": {
+                "summary": "A invalid example",
+                "description": "A **invalid** item works incorrectly.",
+                "value": {
+                    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "first_name": "string",
+                    "last_name": "string",
+                    "email": "user@example.com",
+                    "gender": "MALE",
+                    "wallets": [
+                      {
+                        "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                        "currency": "KZT",
+                        "amount": 0
+                      }
+                    ],
+                    "password": "string"
+                },
+            },
+        }
+    )
 ) -> schemas.User:
     users.append(user)
     return user
