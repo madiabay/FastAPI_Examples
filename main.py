@@ -22,7 +22,7 @@ class UserFirstName(str, Enum):
     kayrat = 'kayrat'
 
 
-@app.get('/calc/{num1}+{num2}')
+@app.get('/calc/{num1}+{num2}', dependencies=[Depends(dependencies.verify_token)])
 def hello_world(
     num1: Annotated[int, Path(...)],
     num2: int = Path(...),
