@@ -8,6 +8,12 @@ async def verify_token(x_token: Annotated[str, Header()]):
         raise HTTPException(status_code=400, detail="X-Token header invalid")
 
 
+async def verify_key(x_key: Annotated[str, Header()]):
+    if x_key != "fake-super-secret-key":
+        raise HTTPException(status_code=400, detail="X-Key header invalid")
+    return x_key
+
+
 class SpecificQuery:
     def __init__(self, limit: int = 10):
         self.limit = limit

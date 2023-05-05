@@ -9,7 +9,9 @@ from blog_routers import blog_router
 from user_routers import user_router
 
 
-app = FastAPI()
+app = FastAPI(
+    dependencies=[Depends(dependencies.verify_key)]
+)
 
 app.include_router(blog_router)
 app.include_router(user_router)
