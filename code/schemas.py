@@ -1,7 +1,7 @@
 import uuid
 from decimal import Decimal
 
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field
 
 import constants
 
@@ -26,11 +26,11 @@ class User(BaseModel):
     #         raise ValueError('first_name не может начинаться буквой а')
     #     return value
 
-    @validator('wallets', each_item=True)
-    def wallets_item_must_gt_0(cls, wallet: Wallet):
-        if wallet.amount <= 0:
-            raise ValueError('value must be greater than 0')
-        return wallet
+    # @validator('wallets', each_item=True)
+    # def wallets_item_must_gt_0(cls, wallet: Wallet):
+    #     if wallet.amount <= 0:
+    #         raise ValueError('value must be greater than 0')
+    #     return wallet
 
     # @validator('wallets')
     # def wallets_length_gt_3(cls, value):
