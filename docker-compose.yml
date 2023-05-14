@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  tech-orda-db:
+    image: postgres:11.19-alpine
+    restart: always
+    ports:
+      - "1234:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
