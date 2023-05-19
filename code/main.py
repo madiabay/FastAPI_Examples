@@ -30,6 +30,7 @@ async def hello(request: Request):
     redis = dependencies.Connection.redis()
     await redis.setex('surname', 10, 'abay')
     return {'surname': await redis.get('surname')}
+    # i should learn redis commands and pipelines in redis and i should learn redis library
 
 
 html = """
