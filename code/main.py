@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from code import database
 from code.users import routers as user_routers
 
@@ -20,3 +21,10 @@ async def shutdown() -> None:
     database_ = app.state.database
     if database_.is_connected:
         await database_.disconnect()
+
+
+@app.get("/hello/")
+async def hello(request: Request):
+    return {
+        'request_url': request.query_params
+    }
