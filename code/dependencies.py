@@ -2,6 +2,8 @@ from typing import Annotated
 
 from fastapi import Query, Depends, Header, HTTPException
 
+from redis import asyncio as aioredis
+
 
 async def verify_token(x_token: Annotated[str, Header()]):
     if x_token != "fake-super-secret-token":
@@ -29,3 +31,19 @@ class CommonQuery:
         self.specific_query = specific_query
         self.page_size = page_size
         self.page = page
+
+
+class Connection:
+    _redis = None
+
+    @classmethod
+    def redis(cls):
+        if not cls._redis:
+            cls._redis = aioredis.from_url('redis://localhost:6379')
+
+        return cls._redis
+
+    @classmethod
+    async def close_redis(cls):
+        if cls._redis:
+            await cls._redis.close()

@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, WebSocket
 from fastapi.responses import JSONResponse, HTMLResponse
 
-from code import database
+from code import database, dependencies
 from code.users import routers as user_routers
 
 app = FastAPI()
@@ -22,12 +22,14 @@ async def shutdown() -> None:
     if database_.is_connected:
         await database_.disconnect()
 
+    await dependencies.Connection.close_redis()
+
 
 @app.get("/hello/")
 async def hello(request: Request):
-    return {
-        'request_url': request.query_params
-    }
+    redis = dependencies.Connection.redis()
+    await redis.setex('surname', 10, 'abay')
+    return {'surname': await redis.get('surname')}
 
 
 html = """
