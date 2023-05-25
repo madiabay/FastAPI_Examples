@@ -1,12 +1,25 @@
+import time
+
 from fastapi import FastAPI, Request, WebSocket
 from fastapi.responses import JSONResponse, HTMLResponse
+from starlette.middleware.authentication import AuthenticationMiddleware
 
-from code import database, dependencies
+from code import database, dependencies, backends
 from code.users import routers as user_routers
 
 app = FastAPI()
+app.add_middleware(AuthenticationMiddleware, backend=backends.BasicAuthBackend())
 app.include_router(user_routers.router)
 app.state.database = database.database
+
+
+@app.middleware('http')
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
 
 
 @app.on_event("startup")
@@ -27,10 +40,9 @@ async def shutdown() -> None:
 
 @app.get("/hello/")
 async def hello(request: Request):
-    redis = dependencies.Connection.redis()
-    await redis.setex('surname', 10, 'abay')
-    return {'surname': await redis.get('surname')}
-    # i should learn redis commands and pipelines in redis and i should learn redis library
+    return {
+        'username': request.user.username
+    }
 
 
 html = """
@@ -48,7 +60,7 @@ html = """
         <ul id='messages'>
         </ul>
         <script>
-            var ws = new WebSocket("ws://localhost:9000/websocket");
+            var ws = new WebSocket("ws://localhost:8000/websocket");
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages')
                 var message = document.createElement('li')
